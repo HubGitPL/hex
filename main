@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <algorithm>
 
 //implementacja dfs: slaj enauczanie + wlasne dodanie rekurencyjnosci
 
@@ -14,7 +15,6 @@
 #define RED_FIELD 1
 #define BLUE_FIELD 2
 
-#define PRINT_WHEN_NO NO
 
 class Counter {
 private:
@@ -110,7 +110,7 @@ public:
         }
         return false;
     }
-    void toPrintYesorNo(bool isYes){
+    void static toPrintYesorNo(bool isYes){
         if(isYes){
             printf("YES\n");
         }
@@ -118,7 +118,7 @@ public:
             printf("NO\n");
         }
     }
-    bool isBoardCorrect(bool isToPrint){
+    bool isBoardCorrect (bool isToPrint) const{
         if(counterRedPawnsNumber == counterBluePawnsNumber ||
            counterRedPawnsNumber == counterBluePawnsNumber + 1){
             if(isToPrint){
@@ -133,11 +133,11 @@ public:
             return false;
         }
     }
-    bool takeDownPawn(int color, bool isToPrint){
+    bool takeDownPawn(int color, bool isToPrint, int colorToPutOn = EMPTY_FIELD){
         for(int i = 0; i < getBOARD_SIZE(); i++){
             for(int j = 0; j < getBOARD_SIZE(); j++) {
                 if(board[i][j] == color) {
-                    board[i][j] = EMPTY_FIELD;
+                    board[i][j] = colorToPutOn;
                     if(!isGameOver(false)) {
                         if(isToPrint){
                             toPrintYesorNo(true);
@@ -161,7 +161,6 @@ public:
                     }
                     return false;
                 }else{
-                    //zdejmuje po kolei kazdy pionek i sprawdzam czy gra sie skonczyla
                     if(takeDownPawn(BLUE_FIELD, isToPrint)){
                         return true;
                     }
@@ -175,9 +174,6 @@ public:
                         }
                         return false;
                     }
-                    //zdejmuje po kolei kazdy pionek i sprawdzam czy gra sie skonczyla
-                    //jesli sie nie skonczyla to zwracam true
-
                     if(takeDownPawn(RED_FIELD, isToPrint)){
                         return true;
                     }
@@ -189,7 +185,7 @@ public:
         }
         return false;
     }
-    bool lookForThreeMinusSigns(char *input) {
+    bool static lookForThreeMinusSigns(char *input) {
         int counterMinusSigns = 0;
         for(char *i = input; *i; i++){
             if(*i == '-'){
@@ -197,6 +193,187 @@ public:
             }
         }
         return counterMinusSigns == 3;
+    }
+    bool whichTurn() const{
+        return counterRedPawnsNumber == counterBluePawnsNumber;
+    }
+    int getNumberOfemptyFields() const{
+        return getBOARD_SIZE()*getBOARD_SIZE() - getSumPAWNS_NUMBER();
+    }
+    bool static getIsNaive(char *input){
+        return *(input+27) == 'N' || *(input+28) == 'N' || *(input+29) == 'N';
+    }
+    bool isGameOver2(bool isToPrint, int color) {
+        if(color == RED_FIELD) {
+            for (int i = 0; i < getBOARD_SIZE(); i++) {
+                if (board[0][i] == RED_FIELD) {
+                    if (handleDFS(RED_FIELD, 0, i, getBOARD_SIZE(), isToPrint)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        else{
+            for (int i = 0; i < getBOARD_SIZE(); i++) {
+                if (board[i][0] == BLUE_FIELD && color == BLUE_FIELD) {
+                    if (handleDFS(BLUE_FIELD, i, 0, getBOARD_SIZE(), isToPrint)) {
+                        return true;
+                    }
+                }
+            }
+            }
+        return false;
+    }
+
+    int static howDeepDepth(int moves, bool turnOfRed, bool isRedToWin){
+        switch(moves){
+            case 1:
+                if(turnOfRed) {
+                    if (isRedToWin) {
+                        return 1;
+                    } else {
+                        return 2;
+                    }
+                }else{
+                    if(isRedToWin){
+                        return 2;
+                    }else{
+                        return 1;
+                    }
+                }
+            case 2:
+                if(turnOfRed){
+                    if(isRedToWin){
+                        return 3;
+                    }else{
+                        return 4;
+                    }
+                }else{
+                    if(isRedToWin){
+                        return 4;
+                    }else{
+                        return 3;
+                    }
+                }
+        }
+        return 0;
+    }
+    int gradeOfPosition(bool isRedToWin){
+        if(isRedToWin){
+            if(isGameOver2(false, RED_FIELD)) {
+                return 1;
+            }
+            else{
+                return 0;
+            }
+        }else{
+            if(isGameOver2(false, BLUE_FIELD)){
+                return 1;
+            }
+            else{
+                return 0;
+            }
+        }
+        return 0;
+    }
+    //gracz i przeciwnik grają tak aby gracz maksymalizował swoją wartość, czyli isRedTowin = true to czerwony ma wygrac a jak false to niebieski
+    int minMaxNaive(bool turnOfRed, bool isNaive, bool isRedToWin, int moves){
+        int bestScore;
+        if(moves == 0){
+            return gradeOfPosition(isRedToWin);
+        }
+        if(moves > 0){
+            if(isRedToWin){
+                if(isGameOver2(false, RED_FIELD)) {
+                    return 0;
+                }
+            }else{
+                if(isGameOver2(false, BLUE_FIELD)){
+                    return 0;
+                }
+            }
+        }
+        if(turnOfRed){
+            bestScore = 0;
+            int score;
+            for(int i = 0; i < getBOARD_SIZE(); i++) {
+                for (int j = 0; j < getBOARD_SIZE(); j++) {
+                    if (board[i][j] == EMPTY_FIELD) {
+                        board[i][j] = RED_FIELD;
+                        score = minMaxNaive(!turnOfRed, isNaive, isRedToWin, moves - 1);
+                        board[i][j] = EMPTY_FIELD;
+                        if (score > bestScore) {
+                            bestScore = score;
+                            return bestScore;
+                        }
+                    }
+                }
+            }
+        }else{
+            bestScore = 0;
+            int score;
+            for(int i = 0; i < getBOARD_SIZE(); i++) {
+                for (int j = 0; j < getBOARD_SIZE(); j++) {
+                    if (board[i][j] == EMPTY_FIELD) {
+                        board[i][j] = BLUE_FIELD;
+                        score = minMaxNaive(!turnOfRed, isNaive, isRedToWin, moves - 1);
+                        board[i][j] = EMPTY_FIELD;
+                        if (score > bestScore) {
+                            bestScore = score;
+                            return bestScore;
+                        }
+                    }
+                }
+            }
+        }
+        return bestScore;
+    }
+    void minMaxDecider(bool turnOfRed, bool isNaive, bool isRedToWin, int moves, bool isToPrint) {
+    //gracz moze miec maksymalnie 2 ruchy, a wiec depth moze byc od 1 do 4 w zaleznosci kto zaczyna runde
+    //czyli dla czerwonych i niebieskich 1-4
+    int bestScore;
+    int colorToCount = (isRedToWin == RED_FIELD) ? counterRedPawnsNumber : counterBluePawnsNumber;
+    if(colorToCount + moves < getBOARD_SIZE()){
+        if(isToPrint){
+            toPrintYesorNo(false);
+            return;
+        }
+    }
+    moves = howDeepDepth(moves, turnOfRed, isRedToWin);
+    if(moves > getNumberOfemptyFields()){
+        if(isToPrint){
+            toPrintYesorNo(false);
+            return;
+        }
+    }
+    if(isNaive){
+        bestScore = minMaxNaive(turnOfRed, isNaive, isRedToWin, moves);
+    }
+    if(isToPrint) {
+        if(bestScore == 1) {
+            toPrintYesorNo(true);
+        } else {
+            toPrintYesorNo(false);
+        }
+    }
+
+    }
+    void redOrBlueMove(char *input, int moves, bool isToPrint){
+        bool turnOfRed = whichTurn();
+        bool isNaive = getIsNaive(input);
+        bool isRedToWin = *(input+4) == 'R';
+        minMaxDecider(turnOfRed, isNaive, isRedToWin, moves, isToPrint);
+    }
+
+    void oneOrTwoMoves(char *input, bool isToPrint){
+        if(*(input+15) == '1' || *(input+16) == '1'){
+            redOrBlueMove(input, 1, isToPrint);
+        }
+        //inaczej dwa ruchy
+        else{
+            redOrBlueMove(input, 2, isToPrint);
+        }
+
     }
     void inputHandler(char *input) {
         switch(*input){
@@ -276,19 +453,19 @@ public:
                     }
                 }
                 break;
-//            case 'C':
-//                if(!isBoardCorrect(false)){
-//                    toPrintYesorNo(false);
-//                }
-//                else if(!isGameOver(false)){
-//                    toPrintYesorNo(false);
-//                }
+            case 'C':
+                if(!isBoardCorrect(false)){
+                    toPrintYesorNo(false);
+                }
+                else if(isGameOver(false)){
+                    toPrintYesorNo(false);
+                }
 //                else if(!isBoardPossible(false)){
 //                    toPrintYesorNo(false);
 //                }
-//                else{
-//                    naiveOrPerfectHandler(true);
-//                }
+                else{
+                    oneOrTwoMoves(input, true);
+                }
             default:
                 break;
         }
