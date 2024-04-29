@@ -1,10 +1,8 @@
 //Mateusz Fydrych
 //12-04-2024
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <algorithm>
+#include <cstdio>
+#include <cmath>
+#include <cstring>
 
 //implementacja dfs: slaj enauczanie + wlasne dodanie rekurencyjnosci
 
@@ -19,7 +17,7 @@
 class Counter {
 private:
     //0 - empty 1 - red 2 - blue
-    int board[BOARD_SIZE][BOARD_SIZE] = { {0} };
+    int board [BOARD_SIZE][BOARD_SIZE] = {{0}};
     int counterLessThanSign = 0;
     int counterRedPawnsNumber = 0;
     int counterBluePawnsNumber = 0;
@@ -30,8 +28,8 @@ private:
     bool isYesBlue = false;
 public:
     void restart() {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
+        for(int i = 0; i < BOARD_SIZE; i++){
+            for(int j = 0; j < BOARD_SIZE; j++){
                 board[i][j] = EMPTY_FIELD;
             }
         }
@@ -44,49 +42,47 @@ public:
         isInTheMiddle = false;
         isYesRed = false;
         isYesBlue = false;
+        printf("\n");
     }
-    bool dfs(int color, int x, int y, int boardSize, bool(&alreadyVisited)[BOARD_SIZE][BOARD_SIZE]) {
-        if (x < 0 || x >= boardSize || y < 0 || y >= boardSize) {
+    bool dfs(int color, int x, int y, int boardSize, bool (& alreadyVisited)[BOARD_SIZE][BOARD_SIZE]){
+        if(x < 0 || x >= boardSize || y < 0 || y >= boardSize){
             return false;
         }
-        if (board[x][y] != color) {
+        if(board[x][y] != color){
             return false;
         }
-        if (alreadyVisited[x][y]) {
+        if(alreadyVisited[x][y]){
             return false;
         }
         alreadyVisited[x][y] = true;
-        return dfs(color, x - 1, y, boardSize, alreadyVisited)
-            || dfs(color, x + 1, y, boardSize, alreadyVisited)
-            || dfs(color, x, y - 1, boardSize, alreadyVisited)
-            || dfs(color, x, y + 1, boardSize, alreadyVisited)
-            || dfs(color, x - 1, y - 1, boardSize, alreadyVisited)
-            || dfs(color, x + 1, y + 1, boardSize, alreadyVisited);
+        return dfs(color, x-1, y, boardSize, alreadyVisited)
+               || dfs(color, x+1, y, boardSize, alreadyVisited)
+               || dfs(color, x, y-1, boardSize , alreadyVisited)
+               || dfs(color, x, y+1, boardSize, alreadyVisited)
+               || dfs(color, x-1, y-1, boardSize, alreadyVisited)
+               || dfs(color, x+1, y+1, boardSize, alreadyVisited);
     }
-    bool handleDFS(int color, int x, int y, int boardSize, bool isToPrint) {
-        bool alreadyVisited[BOARD_SIZE][BOARD_SIZE] = { {false} };
-        if (color == RED_FIELD) {
+    bool handleDFS(int color, int x, int y, int boardSize, bool isToPrint){
+        bool alreadyVisited[BOARD_SIZE][BOARD_SIZE] = {{false}};
+        if(color == RED_FIELD){
             dfs(RED_FIELD, x, y, boardSize, alreadyVisited);
-            for (int i = 0; i < boardSize; i++) {
-                if (alreadyVisited[boardSize - 1][i]) {
-                    if (isToPrint) {
+            for(int i = 0; i < boardSize; i++) {
+                if(alreadyVisited[boardSize-1][i]){
+                    if(isToPrint){
                         printf("YES RED\n");
-                    }
-                    else {
+                    }else{
                         isYesRed = true;
                     }
                     return true;
                 }
             }
-        }
-        else {
+        }else{
             dfs(BLUE_FIELD, x, y, getBOARD_SIZE(), alreadyVisited);
-            for (int i = 0; i < getBOARD_SIZE(); i++) {
-                if (alreadyVisited[i][getBOARD_SIZE() - 1]) {
-                    if (isToPrint) {
+            for(int i = 0; i < getBOARD_SIZE(); i++) {
+                if(alreadyVisited[i][getBOARD_SIZE()-1]){
+                    if(isToPrint){
                         printf("YES BLUE\n");
-                    }
-                    else {
+                    }else{
                         isYesBlue = true;
                     }
                     return true;
@@ -96,58 +92,57 @@ public:
         return false;
     }
     bool isGameOver(bool isToPrint) {
-        for (int i = 0; i < getBOARD_SIZE(); i++) {
-            if (board[0][i] == RED_FIELD) {
-                if (handleDFS(RED_FIELD, 0, i, getBOARD_SIZE(), isToPrint)) {
+        for(int i=0; i < getBOARD_SIZE(); i++){
+            if(board[0][i] == RED_FIELD){
+                if(handleDFS(RED_FIELD, 0, i, getBOARD_SIZE(), isToPrint)){
                     return true;
                 }
             }
-            if (board[i][0] == BLUE_FIELD) {
-                if (handleDFS(BLUE_FIELD, i, 0, getBOARD_SIZE(), isToPrint)) {
+            if(board[i][0] == BLUE_FIELD){
+                if(handleDFS(BLUE_FIELD, i, 0, getBOARD_SIZE(), isToPrint)){
                     return true;
                 }
             }
         }
-        if (isToPrint) {
+        if(isToPrint){
             printf("NO\n");
         }
         return false;
     }
-    void static toPrintYesorNo(bool isYes) {
-        if (isYes) {
+    void static toPrintYesorNo(bool isYes){
+        if(isYes){
             printf("YES\n");
         }
-        else {
+        else{
             printf("NO\n");
         }
     }
-    bool isBoardCorrect(bool isToPrint) const {
-        if (counterRedPawnsNumber == counterBluePawnsNumber ||
-            counterRedPawnsNumber == counterBluePawnsNumber + 1) {
-            if (isToPrint) {
+    bool isBoardCorrect (bool isToPrint) const{
+        if(counterRedPawnsNumber == counterBluePawnsNumber ||
+           counterRedPawnsNumber == counterBluePawnsNumber + 1){
+            if(isToPrint){
                 toPrintYesorNo(true);
             }
             return true;
         }
-        else {
-            if (isToPrint) {
+        else{
+            if(isToPrint){
                 toPrintYesorNo(false);
             }
             return false;
         }
     }
-    bool takeDownPawn(int color, bool isToPrint, int colorToPutOn = EMPTY_FIELD) {
-        for (int i = 0; i < getBOARD_SIZE(); i++) {
-            for (int j = 0; j < getBOARD_SIZE(); j++) {
-                if (board[i][j] == color) {
+    bool takeDownPawn(int color, bool isToPrint, int colorToPutOn = EMPTY_FIELD){
+        for(int i = 0; i < getBOARD_SIZE(); i++){
+            for(int j = 0; j < getBOARD_SIZE(); j++) {
+                if(board[i][j] == color) {
                     board[i][j] = colorToPutOn;
-                    if (!isGameOver(false)) {
-                        if (isToPrint) {
+                    if(!isGameOver(false)) {
+                        if(isToPrint){
                             toPrintYesorNo(true);
                         }
                         return true;
-                    }
-                    else {
+                    }else{
                         board[i][j] = color;
                     }
                 }
@@ -155,61 +150,60 @@ public:
         }
         return false;
     }
-    bool isBoardPossible(bool isToPrint) {
+    bool isBoardPossible(bool isToPrint){
         //jak wygrywa niebieski i jest o 1 lub wiecej czerwonych pionków to false
-        switch (isYesBlue) {
-        case true:
-            if (counterRedPawnsNumber != counterBluePawnsNumber) {
-                if (isToPrint) {
-                    toPrintYesorNo(false);
-                }
-                return false;
-            }
-            else {
-                if (takeDownPawn(BLUE_FIELD, isToPrint)) {
-                    return true;
-                }
-            }
-            break;
-        case false:
-            if (isYesRed) {
-                if (counterRedPawnsNumber - 1 != counterBluePawnsNumber) {
-                    if (isToPrint) {
+        switch (isYesBlue){
+            case true:
+                if(counterRedPawnsNumber != counterBluePawnsNumber){
+                    if(isToPrint){
                         toPrintYesorNo(false);
                     }
                     return false;
+                }else{
+                    if(takeDownPawn(BLUE_FIELD, isToPrint)){
+                        return true;
+                    }
                 }
-                if (takeDownPawn(RED_FIELD, isToPrint)) {
-                    return true;
+                break;
+            case false:
+                if(isYesRed){
+                    if(counterRedPawnsNumber-1 != counterBluePawnsNumber) {
+                        if (isToPrint) {
+                            toPrintYesorNo(false);
+                        }
+                        return false;
+                    }
+                    if(takeDownPawn(RED_FIELD, isToPrint)){
+                        return true;
+                    }
                 }
-            }
-            break;
+                break;
         }
-        if (isToPrint) {
+        if(isToPrint){
             toPrintYesorNo(false);
         }
         return false;
     }
-    bool static lookForThreeMinusSigns(char* input) {
+    bool static lookForThreeMinusSigns(char *input) {
         int counterMinusSigns = 0;
-        for (char* i = input; *i; i++) {
-            if (*i == '-') {
+        for(char *i = input; *i; i++){
+            if(*i == '-'){
                 counterMinusSigns++;
             }
         }
         return counterMinusSigns == 3;
     }
-    bool whichTurn() const {
+    bool whichTurn() const{
         return counterRedPawnsNumber == counterBluePawnsNumber;
     }
-    int getNumberOfemptyFields() const {
-        return getBOARD_SIZE() * getBOARD_SIZE() - getSumPAWNS_NUMBER();
+    int getNumberOfemptyFields() const{
+        return getBOARD_SIZE()*getBOARD_SIZE() - getSumPAWNS_NUMBER();
     }
-    bool static getIsNaive(char* input) {
-        return *(input + 27) == 'N' || *(input + 28) == 'N' || *(input + 29) == 'N';
+    bool static getIsNaive(char *input){
+        return *(input+27) == 'N' || *(input+28) == 'N' || *(input+29) == 'N';
     }
     bool isGameOver2(bool isToPrint, int color) {
-        if (color == RED_FIELD) {
+        if(color == RED_FIELD) {
             for (int i = 0; i < getBOARD_SIZE(); i++) {
                 if (board[0][i] == RED_FIELD) {
                     if (handleDFS(RED_FIELD, 0, i, getBOARD_SIZE(), isToPrint)) {
@@ -218,7 +212,7 @@ public:
                 }
             }
         }
-        else {
+        else{
             for (int i = 0; i < getBOARD_SIZE(); i++) {
                 if (board[i][0] == BLUE_FIELD && color == BLUE_FIELD) {
                     if (handleDFS(BLUE_FIELD, i, 0, getBOARD_SIZE(), isToPrint)) {
@@ -226,276 +220,292 @@ public:
                     }
                 }
             }
-        }
+            }
         return false;
     }
 
-    int static howDeepDepth(int moves, bool turnOfRed, bool isRedToWin) {
-        switch (moves) {
-        case 1:
-            if (turnOfRed) {
-                if (isRedToWin) {
-                    return 1;
+    int static howDeepDepth(int moves, bool turnOfRed, bool isRedToWin){
+        switch(moves){
+            case 1:
+                if(turnOfRed) {
+                    if (isRedToWin) {
+                        return 1;
+                    } else {
+                        return 2;
+                    }
+                }else{
+                    if(isRedToWin){
+                        return 2;
+                    }else{
+                        return 1;
+                    }
                 }
-                else {
-                    return 2;
+            case 2:
+                if(turnOfRed){
+                    if(isRedToWin){
+                        return 3;
+                    }else{
+                        return 4;
+                    }  // b r b r
+                }else{
+                    if(isRedToWin){
+                        return 4;
+                    }else{
+                        return 3;
+                    }
                 }
+        }
+        return 0;
+    }
+    int gradeOfPosition(bool isRedToWin){
+        if(isRedToWin){
+            if(isGameOver2(false, RED_FIELD)) {
+                return 1;
             }
-            else {
-                if (isRedToWin) {
-                    return 2;
-                }
-                else {
-                    return 1;
-                }
+            else{
+                return 0;
             }
-        case 2:
-            if (turnOfRed) {
-                if (isRedToWin) {
-                    return 3;
-                }
-                else {
-                    return 4;
-                }
+        }else{
+            if(isGameOver2(false, BLUE_FIELD)){
+                return 1;
             }
-            else {
-                if (isRedToWin) {
-                    return 4;
-                }
-                else {
-                    return 3;
-                }
+            else{
+                return 0;
             }
         }
         return 0;
     }
-    int gradeOfPosition(bool isRedToWin) {
-        if (isRedToWin) {
-            if (isGameOver2(false, RED_FIELD)) {
-                return 1;
-            }
-            else {
-                return 0;
-            }
+    bool isNextToPawn(int x, int y, int color){
+        if(x-1 >= 0 && board[x-1][y] == color){
+            return true;
         }
-        else {
-            if (isGameOver2(false, BLUE_FIELD)) {
-                return 1;
-            }
-            else {
-                return 0;
-            }
+        if(x+1 < getBOARD_SIZE() && board[x+1][y] == color){
+            return true;
         }
-        return 0;
+        if(y-1 >= 0 && board[x][y-1] == color){
+            return true;
+        }
+        if(y+1 < getBOARD_SIZE() && board[x][y+1] == color){
+            return true;
+        }
+        if(x-1 >= 0 && y-1 >= 0 && board[x-1][y-1] == color){
+            return true;
+        }
+        if(x+1 < getBOARD_SIZE() && y+1 < getBOARD_SIZE() && board[x+1][y+1] == color){
+            return true;
+        }
+        return false;
     }
     //gracz i przeciwnik grają tak aby gracz maksymalizował swoją wartość, czyli isRedTowin = true to czerwony ma wygrac a jak false to niebieski
-    int alphaBeta(bool turnOfRed, bool isNaive, bool isRedToWin, int moves, int alpha, int beta) {
-        // Sprawdź, czy osiągnięto maksymalną głębokość drzewa decyzyjnego lub czy gra się zakończyła
-        if (moves == 0 || (isRedToWin && isGameOver2(false, RED_FIELD)) || (!isRedToWin && isGameOver2(false, BLUE_FIELD))) {
+    int minMaxNaive(bool turnOfRed, bool isNaive, bool isRedToWin, int moves){
+        int bestScore;
+        if(moves == 0){
+            //jezeli zwroci to 1 to koncz jak najszybciej
             return gradeOfPosition(isRedToWin);
         }
-
-        // Sprawdź możliwe ruchy dla danego koloru
-        int color = (turnOfRed) ? RED_FIELD : BLUE_FIELD;
-        for (int i = 0; i < getBOARD_SIZE(); i++) {
-            for (int j = 0; j < getBOARD_SIZE(); j++) {
-                if (board[i][j] == EMPTY_FIELD) {
-                    // Zrób ruch dla danego koloru
-                    board[i][j] = color;
-
-                    // Wywołaj rekurencyjnie algorytm dla przeciwnego koloru
-                    int score = alphaBeta(!turnOfRed, isNaive, isRedToWin, moves - 1, alpha, beta);
-
-                    // Przywróć planszę do stanu pierwotnego
-                    board[i][j] = EMPTY_FIELD;
-
-                    // Jeśli to ruch czerwonych (maksymalizator), zaktualizuj wartość alfa
-                    if (turnOfRed && score > alpha) {
-                        alpha = score;
-
-                        // Przycinanie beta
-                        if (alpha >= beta) {
-                            return alpha;
+        if(moves > 0){
+            if(isRedToWin){
+                if(isGameOver2(false, RED_FIELD)) {
+                    return 0;
+                }
+            }else{
+                if(isGameOver2(false, BLUE_FIELD)){
+                    return 0;
+                }
+            }
+        }
+        if(isRedToWin){
+            bestScore = 0;
+            int score;
+            for(int i = 0; i < getBOARD_SIZE(); i++) {
+                for (int j = 0; j < getBOARD_SIZE(); j++) {
+                    if ((board[i][j] == EMPTY_FIELD && isNextToPawn(i, j, RED_FIELD)) || (counterRedPawnsNumber == 0)) {
+                        board[i][j] = RED_FIELD;
+                        score = minMaxNaive(turnOfRed, isNaive, isRedToWin, moves - 1);
+                        board[i][j] = EMPTY_FIELD;
+                        if (score > bestScore) {
+                            bestScore = score;
+                            return bestScore;
                         }
                     }
-
-                    // Jeśli to ruch niebieskich (minimalizator), zaktualizuj wartość beta
-                    if (!turnOfRed && score < beta) {
-                        beta = score;
-
-                        // Przycinanie alfa
-                        if (beta <= alpha) {
-                            return beta;
+                }
+            }
+        }else{
+            bestScore = 0;
+            int score;
+            for(int i = 0; i < getBOARD_SIZE(); i++) {
+                for (int j = 0; j < getBOARD_SIZE(); j++) {
+                    if ((board[i][j] == EMPTY_FIELD && isNextToPawn(i, j, BLUE_FIELD)) || (counterBluePawnsNumber == 0)) {
+                        board[i][j] = BLUE_FIELD;
+                        score = minMaxNaive(turnOfRed, isNaive, isRedToWin, moves - 1);
+                        board[i][j] = EMPTY_FIELD;
+                        if (score > bestScore) {
+                            bestScore = score;
+                            return bestScore;
                         }
                     }
                 }
             }
         }
-
-        // Zwróć najlepszy wynik zależnie od koloru
-        return (turnOfRed) ? alpha : beta;
+        return bestScore;
     }
-
-
     void minMaxDecider(bool turnOfRed, bool isNaive, bool isRedToWin, int moves, bool isToPrint) {
-        //gracz moze miec maksymalnie 2 ruchy, a wiec depth moze byc od 1 do 4 w zaleznosci kto zaczyna runde
-        //czyli dla czerwonych i niebieskich 1-4
-        int bestScore;
-        int colorToCount = (isRedToWin == RED_FIELD) ? counterRedPawnsNumber : counterBluePawnsNumber;
-        if (colorToCount + moves < getBOARD_SIZE()) {
-            if (isToPrint) {
-                toPrintYesorNo(false);
-                return;
-            }
+    //gracz moze miec maksymalnie 2 ruchy, a wiec depth moze byc od 1 do 4 w zaleznosci kto zaczyna runde
+    //czyli dla czerwonych i niebieskich 1-4
+    int bestScore;
+    int moves2 = moves;
+    int colorToCount = (isRedToWin == RED_FIELD) ? counterRedPawnsNumber : counterBluePawnsNumber;
+    if(colorToCount + moves < getBOARD_SIZE()){
+        if(isToPrint){
+            toPrintYesorNo(false);
+            return;
         }
-        moves = howDeepDepth(moves, turnOfRed, isRedToWin);
-        if (moves > getNumberOfemptyFields()) {
-            if (isToPrint) {
-                toPrintYesorNo(false);
-                return;
-            }
+    }
+    moves = howDeepDepth(moves, turnOfRed, isRedToWin);
+    if(moves > getNumberOfemptyFields()){
+        if(isToPrint){
+            toPrintYesorNo(false);
+            return;
         }
-        if (isNaive) {
-            bestScore = alphaBeta(turnOfRed, isNaive, isRedToWin, moves, -100, 100);
-
+    }
+    if(isNaive){
+        bestScore = minMaxNaive(turnOfRed, isNaive, isRedToWin, moves2);
+    }
+    if(isToPrint) {
+        if(bestScore == 1) {
+            toPrintYesorNo(true);
+        } else {
+            toPrintYesorNo(false);
         }
-        if (isToPrint) {
-            if (bestScore == 1) {
-                toPrintYesorNo(true);
-            }
-            else {
-                toPrintYesorNo(false);
-            }
-        }
+    }
 
     }
-    void redOrBlueMove(char* input, int moves, bool isToPrint) {
+    void redOrBlueMove(char *input, int moves, bool isToPrint){
         bool turnOfRed = whichTurn();
         bool isNaive = getIsNaive(input);
-        bool isRedToWin = *(input + 4) == 'R';
+        bool isRedToWin = *(input+4) == 'R';
         minMaxDecider(turnOfRed, isNaive, isRedToWin, moves, isToPrint);
     }
 
-    void oneOrTwoMoves(char* input, bool isToPrint) {
-        if (*(input + 15) == '1' || *(input + 16) == '1') {
+    void oneOrTwoMoves(char *input, bool isToPrint){
+        if(*(input+15) == '1' || *(input+16) == '1'){
             redOrBlueMove(input, 1, isToPrint);
         }
         //inaczej dwa ruchy
-        else {
+        else{
             redOrBlueMove(input, 2, isToPrint);
         }
 
     }
-    void inputHandler(char* input) {
-        switch (*input) {
-        case '<':
-            counterLessThanSign++;
-            break;
-        case '-':
-            if (lookForThreeMinusSigns(input)) {
-                threeMinusSigns++;
-                if (threeMinusSigns > 2) {
-                    restart();
-                }
-            }
-            else if (*(input + 2) == '<') {
+    void inputHandler(char *input) {
+        switch(*input){
+            case '<':
                 counterLessThanSign++;
-            }
-            break;
-        case '>':
-            if (strlen(input) >= 3) {
-                if (*(input + 2) == '<') {
+                break;
+            case '-':
+                if(lookForThreeMinusSigns(input)){
+                    threeMinusSigns++;
+                    if(threeMinusSigns > 2) {
+                        restart();
+                    }
+                }
+                else if(*(input+2) == '<'){
                     counterLessThanSign++;
-                    xBoard++;
-                    yBoard--;
-                    break;
                 }
-            }
-            else {
-                isInTheMiddle = true;
-            }
+                break;
+            case '>':
+                if(strlen(input) >=3){
+                    if(*(input+2) == '<'){
+                        counterLessThanSign++;
+                        xBoard++;
+                        yBoard--;
+                        break;
+                    }
+                }
+                else{
+                    isInTheMiddle = true;
+                }
 
-            if (!isInTheMiddle) {
-                xBoard = xBoard + 1;
-                yBoard = xBoard;
-                xBoard = 0;
-            }
-            else {
-                int temp = xBoard;
-                yBoard = yBoard + 1;
-                xBoard = yBoard;
-                yBoard = temp;
-            }
-            break;
-        case 'r':
-            counterRedPawnsNumber++;
-            board[xBoard][yBoard] = RED_FIELD;;
-            break;
-        case 'b':
-            counterBluePawnsNumber++;
-            board[xBoard][yBoard] = BLUE_FIELD;
-            break;
-        case 'B':
-            printf("%d\n", (int)getBOARD_SIZE());
-            break;
-        case 'P':
-            printf("%d\n", getSumPAWNS_NUMBER());
-            break;
-        case 'I':
-            if (*(input + 3) == 'B' && *(input + 9) == 'C') {
-                isBoardCorrect(true);
-            }
-            else if (*(input + 3) == 'G') {
-                if (!isBoardCorrect(false)) {
+                if(!isInTheMiddle) {
+                    xBoard = xBoard+1;
+                    yBoard=xBoard;
+                    xBoard=0;
+                }else{
+                    int temp = xBoard;
+                    yBoard = yBoard+1;
+                    xBoard = yBoard;
+                    yBoard = temp;
+                }
+                break;
+            case 'r':
+                counterRedPawnsNumber++;
+                board[xBoard][yBoard] = RED_FIELD;;
+                break;
+            case 'b':
+                counterBluePawnsNumber++;
+                board[xBoard][yBoard] = BLUE_FIELD;
+                break;
+            case 'B':
+                printf("%d\n", (int)getBOARD_SIZE());
+                break;
+            case 'P':
+                printf("%d\n", getSumPAWNS_NUMBER());
+                break;
+            case 'I':
+                if(*(input+3) == 'B' && *(input+9) == 'C'){
+                    isBoardCorrect(true);
+                }
+                else if(*(input+3) == 'G'){
+                    if(!isBoardCorrect(false)){
+                        toPrintYesorNo(false);
+                        break;
+                    }else{
+                        isGameOver(true);
+                    }
+                }
+                else if(*(input+9) == 'P'){
+                    if(!isBoardCorrect(false)){
+                        toPrintYesorNo(false);
+                    }
+                    else if(!isGameOver(false)){
+                        toPrintYesorNo(true);
+                    }
+                    else{
+                        isBoardPossible(true);
+                    }
+                }
+                break;
+            case 'C':
+                if(!isBoardCorrect(false)){
                     toPrintYesorNo(false);
-                    break;
                 }
-                else {
-                    isGameOver(true);
-                }
-            }
-            else if (*(input + 9) == 'P') {
-                if (!isBoardCorrect(false)) {
+                else if(isGameOver(false)){
                     toPrintYesorNo(false);
                 }
-                else if (!isGameOver(false)) {
-                    toPrintYesorNo(true);
+//                else if(isBoardPossible(false)){
+//                    toPrintYesorNo(false);
+//                }
+                else{
+                    oneOrTwoMoves(input, true);
                 }
-                else {
-                    isBoardPossible(true);
-                }
-            }
-            break;
-        case 'C':
-            if (!isBoardCorrect(false)) {
-                toPrintYesorNo(false);
-            }
-            else if (isGameOver(false)) {
-                toPrintYesorNo(false);
-            }
-            //                else if(!isBoardPossible(false)){
-            //                    toPrintYesorNo(false);
-            //                }
-            else {
-                oneOrTwoMoves(input, true);
-            }
-        default:
-            break;
+                printf("\n");
+            default:
+                break;
         }
     }
-    int getSumPAWNS_NUMBER() const {
+    int getSumPAWNS_NUMBER() const{
         return counterRedPawnsNumber + counterBluePawnsNumber;
     }
-    int getBOARD_SIZE() const {
+    int getBOARD_SIZE() const{
         return (int)sqrt((double)counterLessThanSign);
     }
 
 };
 
-void hexHandler() {
-    char input[SIZE_OF_INPUT] = { 0 };
+void hexHandler(){
+    char input [SIZE_OF_INPUT] = {0};
     Counter counter;
-    while (scanf("%s", input) != EOF) { //tutaj ewentualnie cin i zerowac forem input
+    while(scanf("%s", input) != EOF){ //tutaj ewentualnie cin i zerowac forem input
         counter.inputHandler(input);
     }
 }
