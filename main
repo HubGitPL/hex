@@ -323,7 +323,7 @@ public:
             int score;
             for(int i = 0; i < getBOARD_SIZE(); i++) {
                 for (int j = 0; j < getBOARD_SIZE(); j++) {
-                    if ((board[i][j] == EMPTY_FIELD) || (counterRedPawnsNumber == 0)) {
+                    if ((board[i][j] == EMPTY_FIELD) || (counterRedPawnsNumber == 0 && board[i][j] == EMPTY_FIELD)) {
                         board[i][j] = RED_FIELD;
                         score = minMaxNaive(turnOfRed, isNaive, isRedToWin, moves - 1);
                         board[i][j] = EMPTY_FIELD;
@@ -339,7 +339,7 @@ public:
             int score;
             for(int i = 0; i < getBOARD_SIZE(); i++) {
                 for (int j = 0; j < getBOARD_SIZE(); j++) {
-                    if ((board[i][j] == EMPTY_FIELD) || (counterBluePawnsNumber == 0)) {
+                    if ((board[i][j] == EMPTY_FIELD) || (counterBluePawnsNumber == 0 && board[i][j] == EMPTY_FIELD)) {
                         board[i][j] = BLUE_FIELD;
                         score = minMaxNaive(turnOfRed, isNaive, isRedToWin, moves - 1);
                         board[i][j] = EMPTY_FIELD;
@@ -350,6 +350,90 @@ public:
                     }
                 }
             }
+        }
+        return bestScore;
+    }
+    int oneMoveHandler(bool turnOfRed, bool isNaive, bool isRedToWin, int moves){
+        return minMaxNaive(turnOfRed, isNaive, isRedToWin, moves);
+    }
+    int twoMovesHandler(bool turnOfRed, bool isNaive, bool isRedToWin, int moves){
+        int color = (turnOfRed == RED_FIELD) ? RED_FIELD : BLUE_FIELD;
+        int color2 = (turnOfRed == RED_FIELD) ? BLUE_FIELD : RED_FIELD;
+        int counter = 0;
+        //jesli przeciwnik moze wygrac w jednym ruchu to zwracam 0
+        if(minMaxNaive(color, isNaive, !isRedToWin, 1) == 1){
+            return 0;
+        }
+        for (int i = 0; i < getBOARD_SIZE(); i++) {
+            for (int j = 0; j < getBOARD_SIZE(); j++) {
+                if (board[i][j] == EMPTY_FIELD) {
+                    board[i][j] = color2;
+                    if(isGameOver2(false, color2)){
+                        counter++;
+                        if(counter >= 2){
+                            board[i][j] = EMPTY_FIELD;
+                            return 1;
+                        }
+                    }
+                    board[i][j] = EMPTY_FIELD;
+                }
+            }
+        }
+        return 0;
+    }
+    int threeMovesHandler(bool turnOfRed, bool isNaive, bool isRedToWin, int moves){
+        int color = (turnOfRed == RED_FIELD) ? RED_FIELD : BLUE_FIELD;
+        for (int i = 0; i < getBOARD_SIZE(); i++) {
+            for (int j = 0; j < getBOARD_SIZE(); j++) {
+                if (board[i][j] == EMPTY_FIELD) {
+                    board[i][j] = color;
+                    if(isGameOver2(false, color)){
+                        board[i][j] = EMPTY_FIELD;
+                        continue;
+                    }
+                    if(twoMovesHandler(!turnOfRed, isNaive, isRedToWin, 2) == 1){
+                        board[i][j] = EMPTY_FIELD;
+                        return 1;
+                    }
+                    board[i][j] = EMPTY_FIELD;
+                }
+            }
+        }
+        return 0;
+    }
+    int fourMovesHandler(bool turnOfRed, bool isNaive, bool isRedToWin, int moves){
+        int color = (turnOfRed == RED_FIELD) ? RED_FIELD : BLUE_FIELD;
+        if(minMaxNaive(color, isNaive, !isRedToWin, 1) == 1){
+            return 0;
+        }
+        for (int i = 0; i < getBOARD_SIZE(); i++) {
+            for (int j = 0; j < getBOARD_SIZE(); j++) {
+                if (board[i][j] == EMPTY_FIELD) {
+                    board[i][j] = color;
+                    if(isGameOver2(false, color)){
+                        board[i][j] = EMPTY_FIELD;
+                        continue;
+                    }
+                    if(threeMovesHandler(!turnOfRed, isNaive, isRedToWin, 3) == 0){
+                        board[i][j] = EMPTY_FIELD;
+                        return 0;
+                    }
+                    board[i][j] = EMPTY_FIELD;
+                }
+            }
+        }
+        return 1;
+    }
+    int minMaxPerfect(bool turnOfRed, bool isNaive, bool isRedToWin, int moves){
+        int bestScore;
+        if(moves == 1){
+            bestScore = oneMoveHandler(turnOfRed, isNaive, isRedToWin, moves);
+        }else if(moves == 2){
+            bestScore = twoMovesHandler(turnOfRed, isNaive, isRedToWin, moves);
+        }else if(moves == 3){
+            bestScore = threeMovesHandler(turnOfRed, isNaive, isRedToWin, moves);
+        }else{
+            bestScore = fourMovesHandler(turnOfRed, isNaive, isRedToWin, moves);
         }
         return bestScore;
     }
@@ -372,6 +456,9 @@ public:
         }
         if(isNaive){
             bestScore = minMaxNaive(turnOfRed, isNaive, isRedToWin, movesOfThePlayer);
+        }
+        else{
+            bestScore = minMaxPerfect(turnOfRed, isNaive, isRedToWin, moves);
         }
         if(isToPrint) {
             if(bestScore == 1) {
