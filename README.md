@@ -6,10 +6,10 @@ in the folder ,,exampleInputOutput" are example tests. Files contain: 1.input, 2
 
 ## Build 
 1. Go to folder with the project in terminal.
-2. g++ *.cpp -o main
- \n(In the third step change the number (21) with your specific number. Possible numbers to choose: {1,2,4,6,11,16,21}.  
-3. ./main < exampleInputOutput/input/test21.in > exampleInputOutput/my\ output/output21.out
-4. Use this website to compare my and correct output: https://www.diffchecker.com ( alternatively you can use command ,,diff" to compare outputs
+2. g++ *.cpp -o main \
+   (In the third step change the number (21) with your specific number. Possible numbers to choose: {1,2,4,6,11,16,21}.  
+4. ./main < exampleInputOutput/input/test21.in > exampleInputOutput/my\ output/output21.out
+5. Use this website to compare my and correct output: https://www.diffchecker.com ( alternatively you can use command ,,diff" to compare outputs
 
 ## Problems to face
 1. BOARD_SIZE - a number from the range <1;11> indicating the size of the board
