@@ -1,4 +1,4 @@
-# HEX - second projects for Algorithms and data structures
+# HEX - second project for Algorithms and data structures
 Details about the game: https://en.wikipedia.org/wiki/Hex_(board_game)
 
 ## Input/Output
